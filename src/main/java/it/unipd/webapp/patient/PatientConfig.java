@@ -1,5 +1,6 @@
 package it.unipd.webapp.patient;
 
+import it.unipd.webapp.enums.Gender;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,10 +17,18 @@ public class PatientConfig {
         return args -> {
             Patient mariam = new Patient(
                     "mariam",
+                    "faggioli",
+                    Gender.FEMALE,
+                    "09999999",
+                    "via santa lucia",
                     LocalDate.of(2000, Month.APRIL, 26),
-                    "hi@hi.com");
+                    "mariam@hi.com");
             Patient alex = new Patient(
                     "alex",
+                    "faggioli",
+                    Gender.MALE,
+                    "09999999",
+                    "via santa lucia",
                     LocalDate.of(2005, Month.MARCH, 7),
                     "alex@hi.com");
             repository.saveAll(

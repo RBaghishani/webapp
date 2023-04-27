@@ -40,11 +40,11 @@ public class PatientService {
     }
 
     @Transactional
-    public void patchPatient(Long patientId, String name, String email) {
+    public void patchPatient(Long patientId, String firstname, String email) {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalStateException("Patient not found - " + patientId));
-        if (name != null && name.length() > 0 && !Objects.equals(patient.getName(), name)) {
-            patient.setName(name);
+        if (firstname != null && firstname.length() > 0 && !Objects.equals(patient.getFirstname(), firstname)) {
+            patient.setFirstname(firstname);
         }
 
         if (email != null && email.length() > 0 && !Objects.equals(patient.getEmail(), email)) {
