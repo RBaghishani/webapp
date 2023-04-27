@@ -1,4 +1,4 @@
-package it.unipd.webapp.student;
+package it.unipd.webapp.patient;
 
 import jakarta.persistence.*;
 
@@ -7,16 +7,16 @@ import java.time.Period;
 
 @Entity
 @Table
-public class Student {
+public class Patient {
     @Id
     @SequenceGenerator(
-            name = "student_sequence",
-            sequenceName = "student_sequence",
+            name = "patient_sequence",
+            sequenceName = "patient_sequence",
             initialValue = 1
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "student_sequence"
+            generator = "patient_sequence"
     )
     private Long id;
     private String name;
@@ -25,17 +25,17 @@ public class Student {
     private LocalDate dob;
     private String email;
 
-    public Student() {
+    public Patient() {
     }
 
-    public Student(Long id, String name, LocalDate dob, String email) {
+    public Patient(Long id, String name, LocalDate dob, String email) {
         this.id = id;
         this.name = name;
         this.dob = dob;
         this.email = email;
     }
 
-    public Student(String name, LocalDate dob, String email) {
+    public Patient(String name, LocalDate dob, String email) {
         this.name = name;
         this.dob = dob;
         this.email = email;
@@ -83,7 +83,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return "Student{" +
+        return "Patient{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +

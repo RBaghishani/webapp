@@ -1,4 +1,4 @@
-package it.unipd.webapp.student;
+package it.unipd.webapp.patient;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -9,16 +9,16 @@ import java.time.Month;
 import java.util.List;
 
 @Configuration
-public class StudentConfig {
+public class PatientConfig {
 
     @Bean
-    CommandLineRunner commandLineRunner(StudentRepository repository){
+    CommandLineRunner commandLineRunner(PatientRepository repository){
         return args -> {
-            Student mariam = new Student(
+            Patient mariam = new Patient(
                     "mariam",
                     LocalDate.of(2000, Month.APRIL, 26),
                     "hi@hi.com");
-            Student alex = new Student(
+            Patient alex = new Patient(
                     "alex",
                     LocalDate.of(2005, Month.MARCH, 7),
                     "alex@hi.com");
