@@ -29,8 +29,8 @@ public class PatientController {
     }
 
     @PostMapping
-    public void registerNewPatient(@RequestBody Patient patient) {
-        patientService.addNewPatient(patient);
+    public Patient registerNewPatient(@RequestBody Patient patient) {
+        return patientService.addNewPatient(patient);
     }
 
     @DeleteMapping(path = "{patientId}")
@@ -39,8 +39,8 @@ public class PatientController {
     }
 
     @PatchMapping(path = "{patientId}")
-    public void updatePatient(@PathVariable("patientId") Long patientId,
-                              @RequestParam(required = false) String name, @RequestParam(required = false) String email){
-        patientService.patchPatient(patientId, name, email);
+    public Patient updatePatient(@PathVariable("patientId") Long patientId,
+                              @RequestBody Patient patient){
+        return patientService.patchPatient(patientId, patient);
     }
 }

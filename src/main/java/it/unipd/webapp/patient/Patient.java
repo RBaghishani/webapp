@@ -31,11 +31,14 @@ public class Patient {
     private Integer age;
     private LocalDate dob;
     private String email;
+    @Column(nullable = false) // Make sure password cannot be null
+    private String password;
 
     public Patient() {
     }
 
-    public Patient(Long id, String firstname, String lastname, Gender gender, String phoneNumber, String address, Integer age, LocalDate dob, String email) {
+    public Patient(Long id, String firstname, String lastname, Gender gender, String phoneNumber,
+                   String address, Integer age, LocalDate dob, String email, String password) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -44,9 +47,11 @@ public class Patient {
         this.address = address;
         this.dob = dob;
         this.email = email;
+        this.password = password;//new BCryptPasswordEncoder().encode(password);
     }
 
-    public Patient(String firstname, String lastname, Gender gender, String phoneNumber, String address, LocalDate dob, String email) {
+    public Patient(String firstname, String lastname, Gender gender, String phoneNumber,
+                   String address, LocalDate dob, String email, String password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.gender = gender;
@@ -54,6 +59,7 @@ public class Patient {
         this.address = address;
         this.dob = dob;
         this.email = email;
+        this.password = password; //new BCryptPasswordEncoder().encode(password);
     }
 
     public Long getId() {
@@ -122,6 +128,15 @@ public class Patient {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    // Add a method to hash the password using BCryptPasswordEncoder
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
