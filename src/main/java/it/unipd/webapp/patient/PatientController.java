@@ -23,6 +23,11 @@ public class PatientController {
         return patientService.getPatients();
     }
 
+    @GetMapping(path = "{patientId}")
+    public Patient getPatient(@PathVariable("patientId") Long patientId) {
+        return patientService.getPatientsById(patientId);
+    }
+
     @PostMapping
     public void registerNewPatient(@RequestBody Patient patient) {
         patientService.addNewPatient(patient);
