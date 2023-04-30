@@ -1,6 +1,9 @@
 package it.unipd.webapp.patient;
 
+import it.unipd.webapp.helpers.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,5 +45,13 @@ public class PatientController {
     public Patient updatePatient(@PathVariable("patientId") Long patientId,
                               @RequestBody Patient patient){
         return patientService.patchPatient(patientId, patient);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Patient>> searchPatients(
+            @RequestParam(name = "firstname", required = false) String firstname,
+            @RequestParam(name = "lastname", required = false) String lastname) {
+        List<Patient> patients = patientService.searchPatients(firstname, lastname);
+        return ResponseHelper.okay(patients, HttpStatus.OK);
     }
 }

@@ -100,4 +100,9 @@ public class PatientService {
                 .orElseThrow(() -> new IllegalStateException("Patient not found - " + patientId));
         return patient;
     }
+
+    public List<Patient> searchPatients(String firstname, String lastname) {
+        System.out.println("Searching for patients with firstname: " + firstname + ", lastname: " + lastname);
+        return patientRepository.findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(firstname, lastname);
+    }
 }
