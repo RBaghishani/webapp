@@ -1,6 +1,7 @@
 package it.unipd.webapp.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import it.unipd.webapp.enums.Gender;
 import jakarta.persistence.*;
 
@@ -32,7 +33,7 @@ public class Patient {
     private Integer age;
     private LocalDate dob;
     private String email;
-    @JsonIgnore
+
     @Column(nullable = false) // Make sure password cannot be null
     private String password;
 
@@ -132,11 +133,11 @@ public class Patient {
         this.email = email;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
-
-    // Add a method to hash the password using BCryptPasswordEncoder
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }
