@@ -108,9 +108,11 @@ public class PatientService {
     public Patient getPatientsById(Long patientId) throws IOException {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalStateException("Patient not found - " + patientId));
-        File directory = new File("uploads");
-        String base64Img = encodeFileToBase64(directory.getAbsolutePath() + File.separator + patient.getProfilePicture());
-        patient.setAvatar(base64Img);
+        if (patient.getProfilePicture() != null){
+            File directory = new File("uploads");
+            String base64Img = encodeFileToBase64(directory.getAbsolutePath() + File.separator + patient.getProfilePicture());
+            patient.setAvatar(base64Img);
+        }
         return patient;
     }
 
