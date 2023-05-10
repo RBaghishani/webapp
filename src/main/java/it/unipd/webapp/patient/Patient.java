@@ -37,11 +37,14 @@ public class Patient {
     @Column(nullable = false) // Make sure password cannot be null
     private String password;
 
+    @Column(name = "profile_picture")
+    private String profilePicture;
+
     public Patient() {
     }
 
     public Patient(Long id, String firstname, String lastname, Gender gender, String phoneNumber,
-                   String address, Integer age, LocalDate dob, String email, String password) {
+                   String address, Integer age, LocalDate dob, String email, String password, String profilePicture) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -51,10 +54,11 @@ public class Patient {
         this.dob = dob;
         this.email = email;
         this.password = password;//new BCryptPasswordEncoder().encode(password);
+        this.profilePicture = profilePicture;
     }
 
     public Patient(String firstname, String lastname, Gender gender, String phoneNumber,
-                   String address, LocalDate dob, String email, String password) {
+                   String address, LocalDate dob, String email, String password, String profilePicture) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.gender = gender;
@@ -63,6 +67,7 @@ public class Patient {
         this.dob = dob;
         this.email = email;
         this.password = password; //new BCryptPasswordEncoder().encode(password);
+        this.profilePicture = profilePicture;
     }
 
     public Long getId() {
@@ -142,6 +147,14 @@ public class Patient {
         this.password = password;
     }
 
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
     @Override
     public String toString() {
         return "Patient{" +
@@ -154,6 +167,7 @@ public class Patient {
                 ", age=" + age +
                 ", dob=" + dob +
                 ", email='" + email + '\'' +
+                ", profilePicture='" + profilePicture + '\'' +
                 '}';
     }
 }

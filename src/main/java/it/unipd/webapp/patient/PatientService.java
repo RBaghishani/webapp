@@ -4,10 +4,17 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PatientService {
@@ -105,4 +112,37 @@ public class PatientService {
         System.out.println("Searching for patients with firstname: " + firstname + ", lastname: " + lastname);
         return patientRepository.findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(firstname, lastname);
     }
+
+    public void uploadProfilePicture(Long patientId, MultipartFile file) throws IOException {
+        Optional<Patient> optionalPatient = patientRepository.findById(patientId);
+        if (!optionalPatient.isPresent()) {
+            throw new IllegalArgumentException("Patient not found - " + patientId);
+        }
+
+        Patient patient = optionalPatient.get();
+
+        // Save file to disk with randomized filename
+        String filename = UUID.randomUUID().toString() + "." + getFileExtension(file.getOriginalFilename());
+        File directory = new File("uploads");
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+        Path path = Paths.get(directory.getAbsolutePath() + File.separator + filename);
+        try {
+            Files.write(path, file.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException("Failed to save file!");
+        }
+
+        // Update patient's profile picture filename
+        patient.setProfilePicture(filename);
+        patientRepository.save(patient);
+    }
+
+    private String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
+    }
+
 }
