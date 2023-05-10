@@ -40,6 +40,9 @@ public class Patient {
     @Column(name = "profile_picture")
     private String profilePicture;
 
+    @Transient
+    private String avatar;
+
     public Patient() {
     }
 
@@ -147,12 +150,22 @@ public class Patient {
         this.password = password;
     }
 
+    @JsonIgnore
     public String getProfilePicture() {
         return profilePicture;
     }
 
+    @JsonProperty
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     @Override

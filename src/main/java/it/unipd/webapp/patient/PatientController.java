@@ -3,6 +3,7 @@ package it.unipd.webapp.patient;
 import it.unipd.webapp.helpers.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,12 +32,22 @@ public class PatientController {
 
     @GetMapping(path = "{patientId}")
     public Patient getPatient(@PathVariable("patientId") Long patientId) {
-        return patientService.getPatientsById(patientId);
+        try {
+            return patientService.getPatientsById(patientId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @PostMapping
-    public Patient registerNewPatient(@RequestBody Patient patient) {
-        return patientService.addNewPatient(patient);
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public Patient registerNewPatient(@ModelAttribute PatientModel patient) {
+        Patient p = new Patient(patient.getFirstname(),patient.getLastname(),patient.getGender(),patient.getPhoneNumber(),patient.getAddress(),patient.getDob(),patient.getEmail(),patient.getPassword());
+        MultipartFile avatar = patient.getAvatar();
+        try {
+            return patientService.addNewPatient(p, avatar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @DeleteMapping(path = "{patientId}")
@@ -58,7 +69,7 @@ public class PatientController {
         return ResponseHelper.okay(patients, HttpStatus.OK);
     }
 
-    @PostMapping("/{patientId}/uploadProfilePicture")
+    @PatchMapping("/{patientId}/uploadProfilePicture")
     public ResponseEntity<Void> uploadProfilePicture(@PathVariable("patientId") Long patientId,
                                                      @RequestParam("file") MultipartFile file) {
 
