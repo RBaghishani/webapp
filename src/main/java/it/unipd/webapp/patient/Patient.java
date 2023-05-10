@@ -37,6 +37,12 @@ public class Patient {
     @Column(nullable = false) // Make sure password cannot be null
     private String password;
 
+    @Column(name = "profile_picture")
+    private String profilePicture;
+
+    @Transient
+    private String avatar;
+
     public Patient() {
     }
 
@@ -51,6 +57,7 @@ public class Patient {
         this.dob = dob;
         this.email = email;
         this.password = password;//new BCryptPasswordEncoder().encode(password);
+        this.profilePicture = profilePicture;
     }
 
     public Patient(String firstname, String lastname, Gender gender, String phoneNumber,
@@ -63,6 +70,7 @@ public class Patient {
         this.dob = dob;
         this.email = email;
         this.password = password; //new BCryptPasswordEncoder().encode(password);
+        this.profilePicture = profilePicture;
     }
 
     public Long getId() {
@@ -142,6 +150,24 @@ public class Patient {
         this.password = password;
     }
 
+    @JsonIgnore
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    @JsonProperty
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public String toString() {
         return "Patient{" +
@@ -154,6 +180,7 @@ public class Patient {
                 ", age=" + age +
                 ", dob=" + dob +
                 ", email='" + email + '\'' +
+                ", profilePicture='" + profilePicture + '\'' +
                 '}';
     }
 }
