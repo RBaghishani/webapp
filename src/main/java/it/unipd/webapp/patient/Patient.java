@@ -44,7 +44,7 @@ public class Patient {
     }
 
     public Patient(Long id, String firstname, String lastname, Gender gender, String phoneNumber,
-                   String address, Integer age, LocalDate dob, String email, String password, String profilePicture) {
+                   String address, Integer age, LocalDate dob, String email, String password) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -58,7 +58,7 @@ public class Patient {
     }
 
     public Patient(String firstname, String lastname, Gender gender, String phoneNumber,
-                   String address, LocalDate dob, String email, String password, String profilePicture) {
+                   String address, LocalDate dob, String email, String password) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.gender = gender;
