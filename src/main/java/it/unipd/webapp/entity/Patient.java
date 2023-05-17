@@ -1,9 +1,10 @@
-package it.unipd.webapp.patient;
+package it.unipd.webapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.unipd.webapp.enums.Gender;
 import jakarta.persistence.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -32,6 +33,8 @@ public class Patient {
     @Transient
     private Integer age;
     private LocalDate dob;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false) // Make sure password cannot be null

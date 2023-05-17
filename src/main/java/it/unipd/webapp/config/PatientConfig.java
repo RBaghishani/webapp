@@ -1,7 +1,9 @@
-package it.unipd.webapp.patient;
+package it.unipd.webapp.config;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import it.unipd.webapp.entity.Patient;
 import it.unipd.webapp.enums.Gender;
+import it.unipd.webapp.repository.PatientRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

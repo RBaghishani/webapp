@@ -1,6 +1,8 @@
-package it.unipd.webapp.patient;
+package it.unipd.webapp.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import it.unipd.webapp.entity.Patient;
+import it.unipd.webapp.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

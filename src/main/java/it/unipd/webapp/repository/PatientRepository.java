@@ -1,5 +1,6 @@
-package it.unipd.webapp.patient;
+package it.unipd.webapp.repository;
 
+import it.unipd.webapp.entity.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

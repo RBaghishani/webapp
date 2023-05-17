@@ -1,4 +1,4 @@
-package it.unipd.webapp.patient;
+package it.unipd.webapp.model;
 
 import it.unipd.webapp.enums.Gender;
 import jakarta.persistence.*;
