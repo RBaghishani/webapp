@@ -1,10 +1,11 @@
 package it.unipd.webapp.model;
 
 import it.unipd.webapp.enums.Gender;
-import it.unipd.webapp.enums.Role;
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -12,19 +13,16 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class PatientDto {
 
     private String firstname;
     private String lastname;
-    private String email;
-    @NonNull
-    private String password;
-    private Role role;
-
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private String phoneNumber;
     private String address;
     private LocalDate dob;
-    private MultipartFile avatar;
+    private String email;
+    private String avatar;
 }
+

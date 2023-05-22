@@ -1,63 +1,60 @@
 package it.unipd.webapp.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import it.unipd.webapp.entity.Patient;
-import it.unipd.webapp.repository.PatientRepository;
+import it.unipd.webapp.entity.User;
+import it.unipd.webapp.enums.Role;
+import it.unipd.webapp.model.AuthenticationResponse;
+import it.unipd.webapp.model.RegisterRequest;
+import it.unipd.webapp.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+
+import static it.unipd.webapp.service.Utils.encodeFileToBase64;
+import static it.unipd.webapp.service.Utils.saveFile;
 
 @Service
 public class PatientService {
 
-    private final PatientRepository patientRepository;
+    private final UserRepository userRepository;
+
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    public PatientService(PatientRepository patientRepository) {
-        this.patientRepository = patientRepository;
+    public PatientService(UserRepository userRepository, AuthenticationService authenticationService) {
+        this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
     }
 
-    public List<Patient> getPatients() {
-        return patientRepository.findAll();
+    public List<User> getPatients() {
+        return userRepository.findByRole(Role.PATIENT);
     }
 
-    public Patient addNewPatient(Patient patient, MultipartFile avatar) throws IOException {
-        Optional<Patient> patientOptional = patientRepository.findPatientByEmail(patient.getEmail());
-        if (patientOptional.isPresent()) {
-            throw new IllegalStateException("email taken before!");
-        }
-        if (patient.getPassword() == null) throw new IllegalStateException("password cannot be null!");
-        String bcryptHashString = BCrypt.withDefaults().hashToString(10, patient.getPassword().toCharArray());
-        patient.setPassword(bcryptHashString);
-        String filename = saveFile(avatar);
-        // Update patient's profile picture filename
-        patient.setProfilePicture(filename);
-        System.out.println(patient);
-        return patientRepository.save(patient);
+    public AuthenticationResponse addNewPatient(RegisterRequest request) throws IOException {
+        request.setRole(Role.PATIENT);
+        return authenticationService.register(request);
     }
 
     public void deletePatient(Long patientId) {
-        boolean exists = patientRepository.existsById(patientId);
+        /*Optional<User> userOptional = userRepository.findUserById(patientId)
+                .orElseThrow(() -> new IllegalStateException("Patient not found - " + patientId));*/
+        boolean exists = userRepository.existsById(patientId);
         if (!exists) {
             throw new IllegalStateException("patient with indicated id doesn't exists");
         }
-        patientRepository.deleteById(patientId);
+        userRepository.deleteById(patientId);
         //todo remove files related to this patient
     }
 
     @Transactional
-    public Patient patchPatient(Long patientId, Patient patientToUpdate) {
+    public User patchPatient(Long patientId, User patientToUpdate) {
         //todo let it to update the file here
-        Patient patient = patientRepository.findById(patientId)
+        User patient = userRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalStateException("Patient not found - " + patientId));
 
 
@@ -90,7 +87,7 @@ public class PatientService {
         }
 
         if (patientToUpdate.getEmail() != null && patientToUpdate.getEmail().trim().length() > 0 && !Objects.equals(patient.getEmail(), patientToUpdate.getEmail())) {
-            Optional<Patient> patientOptional = patientRepository.findPatientByEmail(patientToUpdate.getEmail());
+            Optional<User> patientOptional = userRepository.findByEmail(patientToUpdate.getEmail());
             if (patientOptional.isPresent()) {
                 throw new IllegalStateException("email taken before!");
             }
@@ -104,11 +101,11 @@ public class PatientService {
         }
 
 
-        return patientRepository.save(patient);
+        return userRepository.save(patient);
     }
 
-    public Patient getPatientsById(Long patientId) throws IOException {
-        Patient patient = patientRepository.findById(patientId)
+    public User getPatientsById(Long patientId) throws IOException {
+        User patient = userRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalStateException("Patient not found - " + patientId));
         if (patient.getProfilePicture() != null){
             File directory = new File("uploads");
@@ -118,56 +115,25 @@ public class PatientService {
         return patient;
     }
 
-    public List<Patient> searchPatients(String firstname, String lastname) {
+    public List<User> searchPatients(String firstname, String lastname) {
         System.out.println("Searching for patients with firstname: " + firstname + ", lastname: " + lastname);
-        return patientRepository.findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(firstname, lastname);
+        return userRepository.findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(firstname, lastname);
     }
 
     public void uploadProfilePicture(Long patientId, MultipartFile file) throws IOException {
         //todo remove avatar  (previous one if exists)
-        Optional<Patient> optionalPatient = patientRepository.findById(patientId);
+        Optional<User> optionalPatient = userRepository.findById(patientId);
         if (!optionalPatient.isPresent()) {
             throw new IllegalArgumentException("Patient not found - " + patientId);
         }
 
-        Patient patient = optionalPatient.get();
+        User patient = optionalPatient.get();
 
         String filename = saveFile(file);
 
         // Update patient's profile picture filename
         patient.setProfilePicture(filename);
-        patientRepository.save(patient);
-    }
-
-    private String saveFile(MultipartFile file) throws IOException {
-        // Save file to disk with randomized filename
-        String filename = UUID.randomUUID().toString() + "." + getFileExtension(file.getOriginalFilename());
-        File directory = new File("uploads");
-        if (!directory.exists()) {
-            directory.mkdir();
-        }
-        Path path = Paths.get(directory.getAbsolutePath() + File.separator + filename);
-        try {
-            Files.write(path, file.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException("Failed to save file!");
-        }
-        return filename;
-    }
-
-    private String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        return (dotIndex == -1) ? "" : fileName.substring(dotIndex + 1);
-    }
-
-    public static String encodeFileToBase64(String filePath) throws IOException {
-        File file = new File(filePath);
-        FileInputStream fis = new FileInputStream(file);
-        byte[] buffer = new byte[(int) file.length()];
-        fis.read(buffer);
-        fis.close();
-        return Base64.getEncoder().encodeToString(buffer);
+        userRepository.save(patient);
     }
 
 }

@@ -1,13 +1,11 @@
 package it.unipd.webapp.entity;
 
+import it.unipd.webapp.enums.Gender;
 import it.unipd.webapp.enums.Role;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -40,6 +38,20 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    //
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    private String phoneNumber;
+    private String address;
+    @Transient
+    private Integer age;
+    private LocalDate dob;
+    @Column(name = "profile_picture")
+    private String profilePicture;
+    @Transient
+    private String avatar;
+
+    //
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities(); //BECAUSE A USER JUST HAVE ONE ROLE
@@ -75,4 +87,10 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    //
+    public Integer getAge() {
+        return Period.between(this.dob, LocalDate.now()).getYears();
+    }
+
 }
