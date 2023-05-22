@@ -1,19 +1,18 @@
-package it.unipd.webapp.patient;
+package it.unipd.webapp.config;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
-import it.unipd.webapp.enums.Gender;
+import it.unipd.webapp.model.RegisterRequest;
+import it.unipd.webapp.service.AuthenticationService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.util.List;
+import static it.unipd.webapp.enums.Role.ADMIN;
+import static it.unipd.webapp.enums.Role.DOCTOR;
 
 @Configuration
-public class PatientConfig {
+public class UserConfig {
 
-    @Bean
+    /*@Bean
     CommandLineRunner commandLineRunner(PatientRepository repository){
         String pass = BCrypt.withDefaults().hashToString(10, "pass".toCharArray());
         String word = BCrypt.withDefaults().hashToString(10, "word".toCharArray());
@@ -41,6 +40,32 @@ public class PatientConfig {
             repository.saveAll(
                     List.of(mariam, alex)
             );
+        };
+    }*/
+
+    @Bean
+    public CommandLineRunner commandLineRunner(
+            AuthenticationService service
+    ) {
+        return args -> {
+            var admin = RegisterRequest.builder()
+                    .firstname("Admin")
+                    .lastname("Admin")
+                    .email("admin@mail.com")
+                    .password("password")
+                    .role(ADMIN)
+                    .build();
+            System.out.println("Admin token: " + service.register(admin).getAccessToken());
+
+            var manager = RegisterRequest.builder()
+                    .firstname("Manager")
+                    .lastname("Manager")
+                    .email("manager@mail.com")
+                    .password("password")
+                    .role(DOCTOR)
+                    .build();
+            System.out.println("Manager token: " + service.register(manager).getAccessToken());
+
         };
     }
 }
