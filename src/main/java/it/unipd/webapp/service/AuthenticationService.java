@@ -7,12 +7,14 @@ import it.unipd.webapp.enums.TokenType;
 import it.unipd.webapp.model.AuthenticationRequest;
 import it.unipd.webapp.model.AuthenticationResponse;
 import it.unipd.webapp.model.RegisterRequest;
+import it.unipd.webapp.model.exception.DuplicateEmailException;
 import it.unipd.webapp.repository.TokenRepository;
 import it.unipd.webapp.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,7 +41,7 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) throws IOException {
         Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
         if (userOptional.isPresent()) {
-            throw new IllegalStateException("email taken before!");
+            throw new DuplicateEmailException("email taken before!", HttpStatus.METHOD_NOT_ALLOWED);
         }
         if (request.getPassword() == null) throw new IllegalStateException("password cannot be null!");
         String filename = null;

@@ -1,5 +1,6 @@
 package it.unipd.webapp.config;
 
+import it.unipd.webapp.model.exception.JwtAuthenticationException;
 import it.unipd.webapp.repository.TokenRepository;
 import it.unipd.webapp.service.JwtService;
 import jakarta.servlet.FilterChain;
@@ -7,13 +8,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.beans.Transient;
 import java.io.IOException;
-import java.security.Security;
 
-import jakarta.transaction.TransactionScoped;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,8 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+            throw new JwtAuthenticationException("Missing or invalid JWT token", HttpStatus.UNAUTHORIZED);
         }
         jwt = authHeader.substring(7);
         userEmail = jwtService.extractUsername(jwt);
@@ -65,6 +62,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                throw new JwtAuthenticationException("Invalid JWT token", HttpStatus.UNAUTHORIZED);
             }
         }
         filterChain.doFilter(request, response);

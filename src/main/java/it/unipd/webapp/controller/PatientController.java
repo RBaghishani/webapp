@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.OPTIONS,RequestMethod.HEAD,RequestMethod.GET,RequestMethod.POST,RequestMethod.PATCH})
 @RequestMapping(path = "api/v1/patient")
-@PreAuthorize("hasAnyRole('ADMIN','DOCTOR','PATIENT')")
+@PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
 public class PatientController {
 
     private final PatientService patientService;
@@ -38,19 +38,20 @@ public class PatientController {
     }
 
     @GetMapping
-    public List<PatientDto> getPatients() {
+    public ResponseEntity<List<PatientDto>> getPatients() {
         List<PatientDto> patientDtos= patientService.getPatients()
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
-        return patientDtos;
-//        return patientService.getPatients();
+        return ResponseHelper.okay(patientDtos, HttpStatus.OK);
     }
 
     @GetMapping(path = "{patientId}")
-    public PatientDto getPatient(@PathVariable("patientId") Long patientId) {
+    @PreAuthorize("hasRole('PATIENT') and #patientId == authentication.principal.getId() or hasAnyRole('ADMIN', 'DOCTOR')")
+    public ResponseEntity<PatientDto> getPatient(@PathVariable("patientId") Long patientId) {
         try {
-            return convertToDto(patientService.getPatientsById(patientId));
+            PatientDto patientDto = convertToDto(patientService.getPatientsById(patientId));
+            return ResponseHelper.okay(patientDto, HttpStatus.OK);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -68,14 +69,17 @@ public class PatientController {
     }
 
     @DeleteMapping(path = "{patientId}")
-    public void deletePatient(@PathVariable("patientId") Long patientId){
+    public ResponseEntity<Void> deletePatient(@PathVariable("patientId") Long patientId){
         patientService.deletePatient(patientId);
+        return ResponseHelper.okay(null, HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping(path = "{patientId}")
-    public PatientDto updatePatient(@PathVariable("patientId") Long patientId,
-                              @RequestBody User patient){
-        return convertToDto(patientService.patchPatient(patientId, patient));
+    @PreAuthorize("hasRole('PATIENT') and #patientId == authentication.principal.getId() or hasAnyRole('ADMIN', 'DOCTOR')")
+    public ResponseEntity<PatientDto> updatePatient(@PathVariable("patientId") Long patientId,
+                                                    @RequestBody User patient){
+        PatientDto patientDto = convertToDto(patientService.patchPatient(patientId, patient));
+        return ResponseHelper.okay(patientDto, HttpStatus.OK);
     }
 
     @GetMapping("/search")
@@ -90,6 +94,7 @@ public class PatientController {
     }
 
     @PatchMapping("/{patientId}/uploadProfilePicture")
+    @PreAuthorize("hasRole('PATIENT') and #patientId == authentication.principal.getId() or hasAnyRole('ADMIN', 'DOCTOR')")
     public ResponseEntity<Void> uploadProfilePicture(@PathVariable("patientId") Long patientId,
                                                      @RequestParam("file") MultipartFile file) {
 
