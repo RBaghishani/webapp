@@ -1,17 +1,13 @@
 package it.unipd.webapp.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest {
-
-    private String email;
-    private String password;
+@AllArgsConstructor
+public class ValidateCodeDto {
     private Integer code;
+    private String email;
 }

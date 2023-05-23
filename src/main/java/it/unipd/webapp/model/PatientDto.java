@@ -24,5 +24,6 @@ public class PatientDto {
     private LocalDate dob;
     private String email;
     private String avatar;
+    private boolean isMfaEnable;
 }
 
