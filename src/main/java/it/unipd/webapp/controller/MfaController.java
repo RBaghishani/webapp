@@ -3,7 +3,6 @@ package it.unipd.webapp.controller;
 
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import it.unipd.webapp.model.EmailDto;
 import it.unipd.webapp.model.ValidateCodeDto;
 import it.unipd.webapp.model.Validation;
 import it.unipd.webapp.service.MfaService;
@@ -29,8 +28,10 @@ public class MfaController {
 
     @SneakyThrows
     @GetMapping("/generate")
-    public void generate(@RequestBody EmailDto generateCodeDto, HttpServletResponse response) {
-        BitMatrix bitMatrix = mfaService.getQrCodeBitMatrix(generateCodeDto.getEmail());
+    public void generate(
+            @RequestParam(name = "email", required = false) String email,
+            HttpServletResponse response) {
+        BitMatrix bitMatrix = mfaService.getQrCodeBitMatrix(email);
         ServletOutputStream outputStream = response.getOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
         outputStream.close();

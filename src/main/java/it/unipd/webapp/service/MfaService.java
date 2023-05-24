@@ -7,9 +7,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
-import it.unipd.webapp.model.EmailDto;
 import it.unipd.webapp.repository.CredentialRepository;
-import it.unipd.webapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
