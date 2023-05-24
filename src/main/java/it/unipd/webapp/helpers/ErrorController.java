@@ -3,6 +3,7 @@ package it.unipd.webapp.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
+import it.unipd.webapp.model.exception.AuthenticationException;
 import it.unipd.webapp.model.exception.DuplicateEmailException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,14 @@ public class ErrorController {
 
     @ExceptionHandler(value = { JwtAuthenticationException.class })
     public ResponseEntity<Object> handleJwtAuthenticationException(JwtAuthenticationException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("message", ex.getMessage());
+        errorResponse.put("status", ex.getStatus().value());
+        return new ResponseEntity<>(errorResponse, ex.getStatus());
+    }
+
+    @ExceptionHandler(value = { AuthenticationException.class })
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("message", ex.getMessage());
         errorResponse.put("status", ex.getStatus().value());

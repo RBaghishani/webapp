@@ -7,6 +7,7 @@ import it.unipd.webapp.enums.TokenType;
 import it.unipd.webapp.model.AuthenticationRequest;
 import it.unipd.webapp.model.AuthenticationResponse;
 import it.unipd.webapp.model.RegisterRequest;
+import it.unipd.webapp.model.exception.AuthenticationException;
 import it.unipd.webapp.model.exception.DuplicateEmailException;
 import it.unipd.webapp.repository.TokenRepository;
 import it.unipd.webapp.repository.UserRepository;
@@ -17,12 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -37,6 +34,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    private final MfaService mfaService;
 
     public AuthenticationResponse register(RegisterRequest request) throws IOException {
         Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
@@ -79,6 +78,9 @@ public class AuthenticationService {
         );
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
+        if (user.isMfaEnable())
+            if (!mfaService.authorizeUser(request.getEmail(), request.getCode()))
+                throw new AuthenticationException("provided code is not valid", HttpStatus.NOT_ACCEPTABLE);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);

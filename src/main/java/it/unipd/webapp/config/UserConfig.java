@@ -64,7 +64,7 @@ public class UserConfig {
                     .password("password")
                     .role(DOCTOR)
                     .build();
-            System.out.println("Manager token: " + service.register(manager).getAccessToken());
+            System.out.println("Doctor token: " + service.register(manager).getAccessToken());
 
         };
     }

@@ -6,8 +6,11 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,6 +54,11 @@ public class User implements UserDetails {
     @Transient
     private String avatar;
 
+    private boolean isMfaEnable;
+    private String secretKey;
+    private int validationCode;
+    private String scratchCodes;
+
     //
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -93,4 +101,13 @@ public class User implements UserDetails {
         return Period.between(this.dob, LocalDate.now()).getYears();
     }
 
+    public List<Integer> getScratchCodes() {
+        return Arrays.stream(scratchCodes.split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+    }
+
+    public void setScratchCodes(List<Integer> scratchCodes) {
+        this.scratchCodes = String.join(",", scratchCodes.stream().map(Object::toString).collect(Collectors.toList()));
+    }
 }

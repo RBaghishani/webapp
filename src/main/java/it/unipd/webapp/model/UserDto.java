@@ -1,7 +1,8 @@
 package it.unipd.webapp.model;
 
 import it.unipd.webapp.enums.Gender;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,17 +14,14 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PatientDto {
+public class UserDto {
 
+
+    private Long id;
     private String firstname;
     private String lastname;
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    private String phoneNumber;
-    private String address;
-    private LocalDate dob;
-    private String email;
-    private String avatar;
     private boolean isMfaEnable;
 }
 
