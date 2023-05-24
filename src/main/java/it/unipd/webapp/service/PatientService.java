@@ -117,7 +117,8 @@ public class PatientService {
 
     public List<User> searchPatients(String firstname, String lastname) {
         System.out.println("Searching for patients with firstname: " + firstname + ", lastname: " + lastname);
-        return userRepository.findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(firstname, lastname);
+        return userRepository.findByNameOrLastNameOrRole(firstname, lastname, Role.PATIENT);
+
     }
 
     public void uploadProfilePicture(Long patientId, MultipartFile file) throws IOException {

@@ -14,7 +14,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findById(Long id);
     // Query method to find patients by firstname and lastname
-    List<User> findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCase(String firstname, String lastname);
-
     List<User> findByRole(Role role);
+
+    default List<User> findByNameOrLastNameOrRole(String name, String lastName, Role role) {
+        if (name == null && lastName == null) {
+            return findByRole(role);
+        } else if (name == null) {
+            return findByLastnameContainingIgnoreCaseAndRole(lastName, role);
+        } else if (lastName == null) {
+            return findByFirstnameContainingIgnoreCaseAndRole(name, role);
+        } else {
+            return findByFirstnameContainingIgnoreCaseAndLastnameContainingIgnoreCaseAndRole(name, lastName, role);
+        }
+    }
+
+    List<User> findByFirstnameContainingIgnoreCaseAndRole(String name, Role role);
+
+    List<User> findByLastnameContainingIgnoreCaseAndRole(String lastName, Role role);
+
+    List<User> findByFirstnameContainingIgnoreCaseAndLastnameContainingIgnoreCaseAndRole(String name, String lastName, Role role);
+
 }
