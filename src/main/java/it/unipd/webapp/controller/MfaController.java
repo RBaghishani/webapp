@@ -5,11 +5,14 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import it.unipd.webapp.model.ValidateCodeDto;
 import it.unipd.webapp.model.Validation;
+import it.unipd.webapp.model.dataDto;
 import it.unipd.webapp.service.MfaService;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.ServletOutputStream;
@@ -19,14 +22,15 @@ import jakarta.servlet.http.HttpServletResponse;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/mfa")
+@RequestMapping("/api/v1/mfa")
+@PermitAll
 public class MfaController {
 
     @Autowired
     private final MfaService mfaService;
 
 
-    @SneakyThrows
+   /* @SneakyThrows
     @GetMapping("/generate")
     public void generate(
             @RequestParam(name = "email", required = false) String email,
@@ -35,13 +39,18 @@ public class MfaController {
         ServletOutputStream outputStream = response.getOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
         outputStream.close();
+    }*/
+
+    @SneakyThrows
+    @GetMapping("/generate")
+    public ResponseEntity<dataDto> generate(
+            @RequestParam(name = "email", required = false) String email) {
+        return ResponseEntity.ok(new dataDto(mfaService.getOtpAuthURL(email)));
     }
 
-
-
     @PostMapping("/validate")
-    public Validation validateKey(@RequestBody ValidateCodeDto body) {
-        return new Validation(mfaService.authorizeUser(body.getEmail(), body.getCode()));
+    public ResponseEntity<Validation> validateKey(@RequestBody ValidateCodeDto body) {
+        return ResponseEntity.ok(new Validation(mfaService.authorizeUser(body.getEmail(), body.getCode())));
     }
 
     /*@GetMapping("/scratches")

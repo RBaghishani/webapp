@@ -25,15 +25,19 @@ public class MfaService {
     }
 
     public BitMatrix getQrCodeBitMatrix(String email) throws WriterException {
-        final GoogleAuthenticatorKey key = gAuth.createCredentials(email);
-
+        String otpAuthURL = getOtpAuthURL(email);
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-
-        String otpAuthURL = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL("my-secure-project", email, key);
         return qrCodeWriter.encode(otpAuthURL, BarcodeFormat.QR_CODE, 200, 200);
     }
 
+    public String getOtpAuthURL(String email) {
+        final GoogleAuthenticatorKey key = gAuth.createCredentials(email);
+        String otpAuthURL = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL("my-secure-project", email, key);
+        return otpAuthURL;
+    }
+
     public boolean authorizeUser(String email, int code) {
-        return gAuth.authorizeUser(email, code, timeWindow);
+//        gAuth.authorize("2IO2JFK2ZRNOKDTAR3UILZJULTPM5M3I", )
+        return gAuth.authorizeUser(email, code);
     }
 }

@@ -1,6 +1,7 @@
 package it.unipd.webapp.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,6 +13,9 @@ import java.util.function.Function;
 
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import it.unipd.webapp.model.UserDto;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,9 @@ public class JwtService {
     @Value("${application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -36,7 +43,8 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> userAsMap = getUserObjectMap(userDetails);
+        return generateToken(userAsMap, userDetails);
     }
 
     public String generateToken(
@@ -49,7 +57,15 @@ public class JwtService {
     public String generateRefreshToken(
             UserDetails userDetails
     ) {
-        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+        Map<String, Object> userAsMap = getUserObjectMap(userDetails);
+        return buildToken(userAsMap, userDetails, refreshExpiration);
+    }
+
+    private Map<String, Object> getUserObjectMap(UserDetails userDetails) {
+        UserDto user = modelMapper.map(userDetails, UserDto.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> userAsMap = objectMapper.convertValue(user, Map.class);
+        return userAsMap;
     }
 
     private String buildToken(
