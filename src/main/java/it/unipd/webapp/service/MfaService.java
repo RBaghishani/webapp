@@ -7,7 +7,9 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
+import it.unipd.webapp.entity.User;
 import it.unipd.webapp.repository.CredentialRepository;
+import it.unipd.webapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +18,15 @@ import org.springframework.stereotype.Service;
 public class MfaService {
     private final GoogleAuthenticator gAuth;
     private final CredentialRepository credentialRepository;
+
+    private final UserRepository userRepository;
     long timeWindow = 3;
 
     @Autowired
-    public MfaService(GoogleAuthenticator gAuth, CredentialRepository credentialRepository) {
+    public MfaService(GoogleAuthenticator gAuth, CredentialRepository credentialRepository, UserRepository userRepository) {
         this.gAuth = gAuth;
         this.credentialRepository = credentialRepository;
+        this.userRepository = userRepository;
     }
 
     public BitMatrix getQrCodeBitMatrix(String email) throws WriterException {
@@ -37,7 +42,14 @@ public class MfaService {
     }
 
     public boolean authorizeUser(String email, int code) {
-//        gAuth.authorize("2IO2JFK2ZRNOKDTAR3UILZJULTPM5M3I", )
-        return gAuth.authorizeUser(email, code);
+        boolean auth = gAuth.authorizeUser(email, code);
+        //todo make it better! not calling the db each time
+        if (auth) {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow();
+            user.setMfaEnable(true);
+            userRepository.save(user);
+        }
+        return auth;
     }
 }

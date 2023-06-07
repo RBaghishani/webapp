@@ -78,9 +78,12 @@ public class AuthenticationService {
         );
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
-        if (user.isMfaEnable())
+        if (user.isMfaEnable()) {
+            if (request.getCode() == null)
+                throw new AuthenticationException("provide the code!", HttpStatus.NOT_ACCEPTABLE);
             if (!mfaService.authorizeUser(request.getEmail(), request.getCode()))
                 throw new AuthenticationException("provided code is not valid", HttpStatus.NOT_ACCEPTABLE);
+        }
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
