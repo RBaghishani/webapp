@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.OPTIONS,RequestMethod.HEAD,RequestMethod.GET,RequestMethod.POST,RequestMethod.PATCH})
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mfa")
 @PermitAll
