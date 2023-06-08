@@ -16,7 +16,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
@@ -54,6 +53,7 @@ public class User implements UserDetails {
     @Transient
     private String avatar;
 
+    private String specialization;
     private boolean isMfaEnable;
     private String secretKey;
     private int validationCode;
