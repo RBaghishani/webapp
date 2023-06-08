@@ -1,11 +1,12 @@
 package it.unipd.webapp.controller;
 
 import it.unipd.webapp.entity.User;
+import it.unipd.webapp.enums.Role;
 import it.unipd.webapp.helpers.ResponseHelper;
 import it.unipd.webapp.model.AuthenticationResponse;
 import it.unipd.webapp.model.PatientDto;
 import it.unipd.webapp.model.RegisterRequest;
-import it.unipd.webapp.service.PatientService;
+import it.unipd.webapp.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
 public class PatientController {
 
-    private final PatientService patientService;
+    private final UserService userService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -33,13 +34,13 @@ public class PatientController {
 //    for dependency injection we use this, preventing from new Patient Service inside the controller also Component or
 //    service on the other side
     @Autowired
-    public PatientController(PatientService patientService) {
-        this.patientService = patientService;
+    public PatientController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
     public ResponseEntity<List<PatientDto>> getPatients() {
-        List<PatientDto> patientDtos= patientService.getPatients()
+        List<PatientDto> patientDtos= userService.getUsers(Role.PATIENT)
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -47,10 +48,10 @@ public class PatientController {
     }
 
     @GetMapping(path = "{patientId}")
-    @PreAuthorize("hasRole('PATIENT') and #patientId == authentication.principal.getId() or hasAnyRole('ADMIN', 'DOCTOR')")
+    @PreAuthorize("(hasRole('PATIENT') and #patientId == authentication.principal.getId()) or hasAnyRole('ADMIN', 'DOCTOR')")
     public ResponseEntity<PatientDto> getPatient(@PathVariable("patientId") Long patientId) {
         try {
-            PatientDto patientDto = convertToDto(patientService.getPatientsById(patientId));
+            PatientDto patientDto = convertToDto(userService.getUserById(patientId));
             return ResponseHelper.okay(patientDto, HttpStatus.OK);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -60,7 +61,7 @@ public class PatientController {
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Object> registerNewPatient(RegisterRequest request) {
         try {
-            AuthenticationResponse response = patientService.addNewPatient(request);
+            AuthenticationResponse response = userService.addNewUser(request, Role.PATIENT);
             return ResponseHelper.okay(response, HttpStatus.CREATED);
         } catch (IOException e) {
             return ResponseHelper.error("Error occurred while adding new patient: " + e.getMessage(),
@@ -70,7 +71,7 @@ public class PatientController {
 
     @DeleteMapping(path = "{patientId}")
     public ResponseEntity<Void> deletePatient(@PathVariable("patientId") Long patientId){
-        patientService.deletePatient(patientId);
+        userService.deleteUser(patientId);
         return ResponseHelper.okay(null, HttpStatus.NO_CONTENT);
     }
 
@@ -78,7 +79,7 @@ public class PatientController {
     @PreAuthorize("hasRole('PATIENT') and #patientId == authentication.principal.getId() or hasAnyRole('ADMIN', 'DOCTOR')")
     public ResponseEntity<PatientDto> updatePatient(@PathVariable("patientId") Long patientId,
                                                     @RequestBody User patient){
-        PatientDto patientDto = convertToDto(patientService.patchPatient(patientId, patient));
+        PatientDto patientDto = convertToDto(userService.patchUser(patientId, patient));
         return ResponseHelper.okay(patientDto, HttpStatus.OK);
     }
 
@@ -86,7 +87,7 @@ public class PatientController {
     public ResponseEntity<List<PatientDto>> searchPatients(
             @RequestParam(name = "firstname", required = false) String firstname,
             @RequestParam(name = "lastname", required = false) String lastname) {
-        List<PatientDto> patients = patientService.searchPatients(firstname, lastname)
+        List<PatientDto> patients = userService.searchUsers(firstname, lastname, Role.PATIENT)
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -99,7 +100,7 @@ public class PatientController {
                                                      @RequestParam("file") MultipartFile file) {
 
         try {
-            patientService.uploadProfilePicture(patientId, file);
+            userService.uploadProfilePicture(patientId, file);
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
