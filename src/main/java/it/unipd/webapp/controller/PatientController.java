@@ -51,7 +51,7 @@ public class PatientController {
     @PreAuthorize("(hasRole('PATIENT') and #patientId == authentication.principal.getId()) or hasAnyRole('ADMIN', 'DOCTOR')")
     public ResponseEntity<PatientDto> getPatient(@PathVariable("patientId") Long patientId) {
         try {
-            PatientDto patientDto = convertToDto(userService.getUserById(patientId));
+            PatientDto patientDto = convertToDto(userService.getUserByIdAndRole(patientId, Role.PATIENT));
             return ResponseHelper.okay(patientDto, HttpStatus.OK);
         } catch (IOException e) {
             throw new RuntimeException(e);

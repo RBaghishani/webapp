@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.OPTIONS,RequestMethod.HEAD,RequestMethod.GET,RequestMethod.POST,RequestMethod.PATCH})
 @RequestMapping(path = "api/v1/doctor")
-@PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
 public class DoctorController {
 
     private final UserService userService;
@@ -52,7 +51,7 @@ public class DoctorController {
     @GetMapping(path = "{doctorId}")
     public ResponseEntity<DoctorDto> getDoctor(@PathVariable("doctorId") Long doctorId) {
         try {
-            DoctorDto doctorDto = convertToDto(userService.getUserById(doctorId));
+            DoctorDto doctorDto = convertToDto(userService.getUserByIdAndRole(doctorId, Role.DOCTOR));
             return ResponseHelper.okay(doctorDto, HttpStatus.OK);
         } catch (IOException e) {
             throw new RuntimeException(e);
