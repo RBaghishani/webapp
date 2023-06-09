@@ -94,8 +94,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User getUserById(Long userId) throws IOException {
-        User user = userRepository.findById(userId)
+    public User getUserByIdAndRole(Long userId, Role role) throws IOException {
+        User user = userRepository.findByIdAndRole(userId, role)
                 .orElseThrow(() -> new IllegalStateException("User not found - " + userId));
         if (user.getProfilePicture() != null){
             File directory = new File("uploads");
