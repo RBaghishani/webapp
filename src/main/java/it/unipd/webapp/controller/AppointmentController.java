@@ -34,6 +34,7 @@ public class AppointmentController {
     private ModelMapper modelMapper;
 
     @PostMapping
+    @PreAuthorize("(hasRole('PATIENT') and #appointmentDto.getPatientId() == authentication.principal.getId()) or (hasRole('DOCTOR') and #appointmentDto.getDoctorId() == authentication.principal.getId()) or hasRole('ADMIN')")
     public ResponseEntity<?> createAppointment(@RequestBody AppointmentDto appointmentDto) {
         try {
             Appointment appointment = appointmentService.createAppointment(appointmentDto);
@@ -48,6 +49,7 @@ public class AppointmentController {
     }
 
     @GetMapping
+    @PreAuthorize("(hasRole('PATIENT') and #patientId == authentication.principal.getId()) or (hasRole('DOCTOR') and #doctorId == authentication.principal.getId()) or hasRole('ADMIN')")
     public ResponseEntity<?> listAppointments(
             @RequestParam(required = false) Long doctorId,
             @RequestParam(required = false) Long patientId,
