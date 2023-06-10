@@ -3,6 +3,7 @@ package it.unipd.webapp.controller;
 import it.unipd.webapp.entity.Appointment;
 import it.unipd.webapp.model.AppointmentDto;
 import it.unipd.webapp.model.exception.AppointmentConflictException;
+import it.unipd.webapp.model.exception.AppointmentNotFoundException;
 import it.unipd.webapp.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -70,4 +71,20 @@ public class AppointmentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
+    @PutMapping("/{id}")
+    @PreAuthorize("(hasRole('PATIENT') and #appointmentDto.getPatientId() == authentication.principal.getId()) or (hasRole('DOCTOR') and #appointmentDto.getDoctorId() == authentication.principal.getId()) or hasRole('ADMIN')")
+    public ResponseEntity<?> updateAppointment(@PathVariable Long id, @RequestBody AppointmentDto appointmentDto) {
+        try {
+            Appointment appointment = appointmentService.updateAppointment(id, appointmentDto);
+            AppointmentDto responseDto = modelMapper.map(appointment, AppointmentDto.class);
+            return ResponseEntity.ok(responseDto);
+        } catch (AppointmentNotFoundException e) {
+            return ResponseEntity.status(e.getStatus()).body(Collections.singletonMap("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", e.getMessage()));
+        }
+    }
+
 }
