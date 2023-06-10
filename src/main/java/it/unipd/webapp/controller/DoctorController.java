@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.OPTIONS,RequestMethod.HEAD,RequestMethod.GET,RequestMethod.POST,RequestMethod.PATCH})
 @RequestMapping(path = "api/v1/doctor")
+@PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'PATIENT')")
 public class DoctorController {
 
     private final UserService userService;
@@ -39,7 +40,6 @@ public class DoctorController {
     }
 
     @GetMapping
-    @PermitAll
     public ResponseEntity<List<DoctorDto>> getDoctors() {
         List<DoctorDto> doctorDtos= userService.getUsers(Role.DOCTOR)
                 .stream()
@@ -59,6 +59,7 @@ public class DoctorController {
     }
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> registerNewDoctor(RegisterRequest request) {
         try {
             AuthenticationResponse response = userService.addNewUser(request, Role.DOCTOR);
@@ -77,7 +78,7 @@ public class DoctorController {
     }
 
     @PatchMapping(path = "{doctorId}")
-    @PreAuthorize("hasRole('DOCTOR') and #doctorId == authentication.principal.getId() or hasRole('ADMIN')")
+    @PreAuthorize("(hasRole('DOCTOR') and #doctorId == authentication.principal.getId())or hasRole('ADMIN')")
     public ResponseEntity<DoctorDto> updateDoctor(@PathVariable("doctorId") Long doctorId,
                                                     @RequestBody User doctor){
         DoctorDto doctorDto = convertToDto(userService.patchUser(doctorId, doctor));
@@ -96,7 +97,7 @@ public class DoctorController {
     }
 
     @PatchMapping("/{doctorId}/uploadProfilePicture")
-    @PreAuthorize("hasRole('PATIENT') and #doctorId == authentication.principal.getId() or hasAnyRole('ADMIN', 'DOCTOR')")
+    @PreAuthorize("(hasRole('DOCTOR') and #doctorId == authentication.principal.getId()) or hasRole('ADMIN')")
     public ResponseEntity<Void> uploadProfilePicture(@PathVariable("doctorId") Long doctorId,
                                                      @RequestParam("file") MultipartFile file) {
 
