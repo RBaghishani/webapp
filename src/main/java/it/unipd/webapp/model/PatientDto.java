@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PatientDto {
 
+    private Long id;
     private String firstname;
     private String lastname;
     @Enumerated(EnumType.STRING)

@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class DoctorDto {
 
+    private Long id;
     private String firstname;
     private String lastname;
     @Enumerated(EnumType.STRING)
@@ -26,7 +27,6 @@ public class DoctorDto {
     private String email;
     private String avatar;
     private String specialization;
-    @JsonIgnore
     private boolean isMfaEnable;
 }
 
