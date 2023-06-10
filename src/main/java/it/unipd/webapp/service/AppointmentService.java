@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class AppointmentService {
@@ -49,4 +51,23 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
+    public List<Appointment> listAppointments(Long doctorId, Long patientId, LocalDateTime date) throws IOException {
+        User doctor = null;
+        User patient = null;
+        if (doctorId != null) {
+            doctor = userService.getUserByIdAndRole(doctorId, Role.DOCTOR);
+        }
+        if (patientId != null) {
+            patient = userService.getUserByIdAndRole(patientId, Role.PATIENT);
+        }
+        if (date != null) {
+            LocalDateTime startOfDay = date.with(LocalTime.MIN);
+            LocalDateTime endOfDay = date.with(LocalTime.MAX);
+            return appointmentRepository.findByDoctorOrPatientAndTimeBetween(doctor, patient, startOfDay, endOfDay);
+        } else if (patient != null || doctor!= null){
+            return appointmentRepository.findByDoctorOrPatient(doctor, patient);
+        } else {
+            return appointmentRepository.findAll();
+        }
+    }
 }

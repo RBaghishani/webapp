@@ -12,10 +12,10 @@ import java.util.Optional;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-    Optional<Appointment> findByDoctor(Appointment doctor);
+    List<Appointment> findByDoctorOrPatient(User doctor, User patient);
     Optional<Appointment> findById(Long id);
 
-    List<Appointment> findByPatient(Appointment patient);
+    List<Appointment> findByDoctorOrPatientAndTimeBetween(User doctor, User patient,  LocalDateTime startOfDay, LocalDateTime endOfDay);
 
     boolean existsByDoctorAndTimeBetween(User doctor, LocalDateTime startTime, LocalDateTime endTime);
 
