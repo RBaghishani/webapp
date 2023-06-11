@@ -25,6 +25,7 @@ public class RegisterRequest {
     private Gender gender;
     private String phoneNumber;
     private String address;
+    private String specialization;
     private LocalDate dob;
     private MultipartFile avatar;
 }

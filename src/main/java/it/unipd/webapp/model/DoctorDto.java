@@ -1,7 +1,9 @@
 package it.unipd.webapp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unipd.webapp.enums.Gender;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +15,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PatientDto {
+public class DoctorDto {
 
     private Long id;
     private String firstname;
@@ -22,9 +24,9 @@ public class PatientDto {
     private Gender gender;
     private String phoneNumber;
     private String address;
-    private LocalDate dob;
     private String email;
     private String avatar;
+    private String specialization;
     private boolean isMfaEnable;
 }
 

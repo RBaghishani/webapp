@@ -58,6 +58,7 @@ public class AuthenticationService {
                 .address(request.getAddress())
                 .dob(request.getDob())
                 .profilePicture(filename)
+                .specialization(request.getSpecialization())
                 .build();
         var savedUser = userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
