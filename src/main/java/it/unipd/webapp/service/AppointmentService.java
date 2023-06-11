@@ -39,7 +39,7 @@ public class AppointmentService {
         if (appointmentRepository.existsByDoctorAndTimeBetween(doctor, time, timePlusOne))
             throw new AppointmentConflictException("An appointment already exists for this doctor at this time.", HttpStatus.CONFLICT);
 
-        if (appointmentRepository.existsByPatientAndTimeBetween(doctor, time, timePlusOne))
+        if (appointmentRepository.existsByPatientAndTimeBetween(patient, time, timePlusOne))
             throw new AppointmentConflictException("An appointment already exists for this patient at this time.", HttpStatus.CONFLICT);
 
         Appointment appointment = Appointment.builder()
