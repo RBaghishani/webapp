@@ -3,14 +3,14 @@ package it.unipd.webapp.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.unipd.webapp.model.exception.AuthenticationException;
-import it.unipd.webapp.model.exception.DuplicateEmailException;
+import it.unipd.webapp.exception.AuthenticationException;
+import it.unipd.webapp.exception.DuplicateEmailException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import it.unipd.webapp.model.exception.JwtAuthenticationException;
+import it.unipd.webapp.exception.JwtAuthenticationException;
 
 @ControllerAdvice
 public class ErrorController {

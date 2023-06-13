@@ -2,8 +2,8 @@ package it.unipd.webapp.controller;
 
 import it.unipd.webapp.entity.Appointment;
 import it.unipd.webapp.model.AppointmentDto;
-import it.unipd.webapp.model.exception.AppointmentConflictException;
-import it.unipd.webapp.model.exception.AppointmentNotFoundException;
+import it.unipd.webapp.exception.AppointmentConflictException;
+import it.unipd.webapp.exception.AppointmentNotFoundException;
 import it.unipd.webapp.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
