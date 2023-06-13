@@ -54,6 +54,7 @@ public class UserConfig {
                     .email("admin@mail.com")
                     .password("password")
                     .role(ADMIN)
+                    .phoneNumber("528-250-3661")
                     .build();
             System.out.println("Admin token: " + service.register(admin).getAccessToken());
 
@@ -63,6 +64,7 @@ public class UserConfig {
                     .email("manager@mail.com")
                     .password("password")
                     .role(DOCTOR)
+                    .phoneNumber("545-583-3204")
                     .build();
             System.out.println("Doctor token: " + service.register(manager).getAccessToken());
 

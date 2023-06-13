@@ -8,6 +8,8 @@ import it.unipd.webapp.model.Validation;
 import it.unipd.webapp.model.dataDto;
 import it.unipd.webapp.service.MfaService;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -45,12 +47,12 @@ public class MfaController {
     @SneakyThrows
     @GetMapping("/generate")
     public ResponseEntity<dataDto> generate(
-            @RequestParam(name = "email", required = false) String email) {
+            @Valid @Email @RequestParam(name = "email", required = false) String email) {
         return ResponseEntity.ok(new dataDto(mfaService.getOtpAuthURL(email)));
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<Validation> validateKey(@RequestBody ValidateCodeDto body) {
+    public ResponseEntity<Validation> validateKey(@Valid @RequestBody ValidateCodeDto body) {
         return ResponseEntity.ok(new Validation(mfaService.authorizeUser(body.getEmail(), body.getCode())));
     }
 

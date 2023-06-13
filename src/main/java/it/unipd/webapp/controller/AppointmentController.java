@@ -5,6 +5,7 @@ import it.unipd.webapp.model.AppointmentDto;
 import it.unipd.webapp.model.exception.AppointmentConflictException;
 import it.unipd.webapp.model.exception.AppointmentNotFoundException;
 import it.unipd.webapp.service.AppointmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class AppointmentController {
 
     @PostMapping
     @PreAuthorize("(hasRole('PATIENT') and #appointmentDto.getPatientId() == authentication.principal.getId()) or (hasRole('DOCTOR') and #appointmentDto.getDoctorId() == authentication.principal.getId()) or hasRole('ADMIN')")
-    public ResponseEntity<?> createAppointment(@RequestBody AppointmentDto appointmentDto) {
+    public ResponseEntity<?> createAppointment(@Valid @RequestBody AppointmentDto appointmentDto) {
         try {
             Appointment appointment = appointmentService.createAppointment(appointmentDto);
             AppointmentDto responseDto = modelMapper.map(appointment, AppointmentDto.class);
@@ -73,7 +74,7 @@ public class AppointmentController {
 
     @PutMapping("/{id}")
     @PreAuthorize("(hasRole('PATIENT') and #appointmentDto.getPatientId() == authentication.principal.getId()) or (hasRole('DOCTOR') and #appointmentDto.getDoctorId() == authentication.principal.getId()) or hasRole('ADMIN')")
-    public ResponseEntity<?> updateAppointment(@PathVariable Long id, @RequestBody AppointmentDto appointmentDto) {
+    public ResponseEntity<?> updateAppointment(@PathVariable Long id, @Valid @RequestBody AppointmentDto appointmentDto) {
         try {
             Appointment appointment = appointmentService.updateAppointment(id, appointmentDto);
             AppointmentDto responseDto = modelMapper.map(appointment, AppointmentDto.class);
