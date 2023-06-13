@@ -16,5 +16,6 @@ public class AppointmentDto {
     @Future
     private LocalDateTime time;
     private String prescription;
+    private String code;
     //todo add file also
 }

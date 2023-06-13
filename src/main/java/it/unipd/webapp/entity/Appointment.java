@@ -29,5 +29,5 @@ public class Appointment {
 
     private String prescription;
 
-    private String filePath;
+    private String code;
 }
