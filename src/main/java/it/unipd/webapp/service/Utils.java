@@ -1,5 +1,6 @@
 package it.unipd.webapp.service;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -41,5 +43,25 @@ public class Utils {
         fis.read(buffer);
         fis.close();
         return Base64.getEncoder().encodeToString(buffer);
+    }
+
+    public static boolean validateFile(MultipartFile file) {
+        String contentType = file.getContentType();
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        long fileSize = file.getSize();
+
+        if (!Arrays.asList("image/jpeg", "image/jpg", "image/png").contains(contentType)) {
+            return false; // unsupported content type
+        }
+
+        if (!Arrays.asList("jpg", "jpeg", "png").contains(extension.toLowerCase())) {
+            return false; // unsupported file extension
+        }
+
+        if (fileSize > 10000000) {
+            return false; // file size exceeds the maximum allowed size of 10 MB
+        }
+
+        return true; // file is valid
     }
 }

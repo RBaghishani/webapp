@@ -6,9 +6,11 @@ import it.unipd.webapp.model.RegisterRequest;
 import it.unipd.webapp.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -23,17 +25,13 @@ public class AuthenticationController {
 
     @PostMapping(path = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<AuthenticationResponse> register(
-            @ModelAttribute RegisterRequest request
-    ) {
-        try {
-            return ResponseEntity.ok(service.register(request));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            @Valid RegisterRequest request
+    ) throws IOException {
+        return ResponseEntity.ok(service.register(request));
     }
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
+            @Valid @RequestBody AuthenticationRequest request
     ) {
         return ResponseEntity.ok(service.authenticate(request));
     }

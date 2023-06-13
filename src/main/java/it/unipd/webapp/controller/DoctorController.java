@@ -8,6 +8,8 @@ import it.unipd.webapp.model.DoctorDto;
 import it.unipd.webapp.model.RegisterRequest;
 import it.unipd.webapp.service.UserService;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static it.unipd.webapp.service.Utils.validateFile;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.OPTIONS,RequestMethod.HEAD,RequestMethod.GET,RequestMethod.POST,RequestMethod.PATCH})
@@ -60,8 +64,9 @@ public class DoctorController {
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> registerNewDoctor(RegisterRequest request) {
+    public ResponseEntity<Object> registerNewDoctor(@Valid RegisterRequest request) {
         try {
+            if (request.getAvatar() != null && !validateFile(request.getAvatar())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             AuthenticationResponse response = userService.addNewUser(request, Role.DOCTOR);
             return ResponseHelper.okay(response, HttpStatus.CREATED);
         } catch (IOException e) {
@@ -80,15 +85,15 @@ public class DoctorController {
     @PatchMapping(path = "{doctorId}")
     @PreAuthorize("(hasRole('DOCTOR') and #doctorId == authentication.principal.getId())or hasRole('ADMIN')")
     public ResponseEntity<DoctorDto> updateDoctor(@PathVariable("doctorId") Long doctorId,
-                                                    @RequestBody User doctor){
+                                                    @Valid @RequestBody User doctor){
         DoctorDto doctorDto = convertToDto(userService.patchUser(doctorId, doctor));
         return ResponseHelper.okay(doctorDto, HttpStatus.OK);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<DoctorDto>> searchDoctors(
-            @RequestParam(name = "firstname", required = false) String firstname,
-            @RequestParam(name = "lastname", required = false) String lastname) {
+            @Size(min = 2, max = 30) @RequestParam(name = "firstname", required = false) String firstname,
+            @Size(min = 2, max = 30)@RequestParam(name = "lastname", required = false) String lastname) {
         List<DoctorDto> doctors = userService.searchUsers(firstname, lastname, Role.DOCTOR)
                 .stream()
                 .map(this::convertToDto)
@@ -99,9 +104,10 @@ public class DoctorController {
     @PatchMapping("/{doctorId}/uploadProfilePicture")
     @PreAuthorize("(hasRole('DOCTOR') and #doctorId == authentication.principal.getId()) or hasRole('ADMIN')")
     public ResponseEntity<Void> uploadProfilePicture(@PathVariable("doctorId") Long doctorId,
-                                                     @RequestParam("file") MultipartFile file) {
+                                                     @Size(max = 10000000) @RequestParam("file") MultipartFile file) {
 
         try {
+            if (!validateFile(file))  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             userService.uploadProfilePicture(doctorId, file);
         } catch (IOException e) {
             e.printStackTrace();

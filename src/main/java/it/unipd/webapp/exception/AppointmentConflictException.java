@@ -1,15 +1,16 @@
-package it.unipd.webapp.model.exception;
+package it.unipd.webapp.exception;
 
 import org.springframework.http.HttpStatus;
 
 import java.io.Serial;
 
-public class AuthenticationException extends RuntimeException {
+public class AppointmentConflictException extends RuntimeException {
+
     @Serial
     private static final long serialVersionUID = 1L;
     private final HttpStatus status;
 
-    public AuthenticationException(String message, HttpStatus status) {
+    public AppointmentConflictException(String message, HttpStatus status) {
         super(message);
         this.status = status;
     }
@@ -17,5 +18,7 @@ public class AuthenticationException extends RuntimeException {
     public HttpStatus getStatus() {
         return status;
     }
+
+
 
 }

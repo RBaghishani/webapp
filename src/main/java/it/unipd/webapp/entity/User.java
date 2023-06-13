@@ -11,6 +11,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,9 +33,21 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     private Long id;
+
+    @NotBlank
+    @Size(min = 2, max = 30)
     private String firstname;
+
+    @NotBlank
+    @Size(min = 2, max = 30)
     private String lastname;
+
+    @NotBlank
+    @Email
     private String email;
+
+    @NotBlank
+    @Size(min = 8)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -43,6 +59,9 @@ public class User implements UserDetails {
     //
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    @NotBlank
+    @Pattern(regexp = "^(\\+\\d{1,2}\\s?)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$")
     private String phoneNumber;
     private String address;
     @Transient

@@ -1,4 +1,4 @@
-package it.unipd.webapp.model.exception;
+package it.unipd.webapp.exception;
 
 import org.springframework.http.HttpStatus;
 

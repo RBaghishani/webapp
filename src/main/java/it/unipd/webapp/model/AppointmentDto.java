@@ -1,5 +1,6 @@
 package it.unipd.webapp.model;
 
+import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,9 @@ import java.time.LocalDateTime;
 public class AppointmentDto {
     private Long doctorId;
     private Long patientId;
+    @Future
     private LocalDateTime time;
     private String prescription;
+    private String code;
     //todo add file also
 }

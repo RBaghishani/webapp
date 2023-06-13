@@ -1,6 +1,6 @@
 package it.unipd.webapp.config;
 
-import it.unipd.webapp.model.exception.JwtAuthenticationException;
+import it.unipd.webapp.exception.JwtAuthenticationException;
 import it.unipd.webapp.repository.TokenRepository;
 import it.unipd.webapp.service.JwtService;
 import jakarta.servlet.FilterChain;
