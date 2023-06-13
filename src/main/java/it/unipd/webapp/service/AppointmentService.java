@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -143,5 +144,14 @@ public class AppointmentService {
             }
         }
         return availableTimeSlots.contains(time);
+    }
+
+    public Appointment getAppointmentByCode(String code) throws AppointmentNotFoundException {
+        Optional<Appointment> optionalAppointment = appointmentRepository.findByCode(code);
+        if (optionalAppointment.isPresent()) {
+            return optionalAppointment.get();
+        } else {
+            throw new AppointmentNotFoundException("Appointment not found.", HttpStatus.NOT_FOUND);
+        }
     }
 }
