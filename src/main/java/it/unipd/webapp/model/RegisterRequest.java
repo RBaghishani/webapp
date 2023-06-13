@@ -42,6 +42,5 @@ public class RegisterRequest {
     private String address;
     private String specialization;
     private LocalDate dob;
-    @Size(max = 10000000)
     private MultipartFile avatar;
 }

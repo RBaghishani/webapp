@@ -66,6 +66,7 @@ public class DoctorController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> registerNewDoctor(@Valid RegisterRequest request) {
         try {
+            if (request.getAvatar() != null && !validateFile(request.getAvatar())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             AuthenticationResponse response = userService.addNewUser(request, Role.DOCTOR);
             return ResponseHelper.okay(response, HttpStatus.CREATED);
         } catch (IOException e) {
@@ -106,6 +107,7 @@ public class DoctorController {
                                                      @Size(max = 10000000) @RequestParam("file") MultipartFile file) {
 
         try {
+            if (!validateFile(file))  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             userService.uploadProfilePicture(doctorId, file);
         } catch (IOException e) {
             e.printStackTrace();

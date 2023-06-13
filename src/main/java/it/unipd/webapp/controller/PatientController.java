@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static it.unipd.webapp.service.Utils.validateFile;
+
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.PUT,RequestMethod.DELETE,RequestMethod.OPTIONS,RequestMethod.HEAD,RequestMethod.GET,RequestMethod.POST,RequestMethod.PATCH})
 @RequestMapping(path = "api/v1/patient")
@@ -62,8 +64,9 @@ public class PatientController {
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Object> registerNewPatient(@Valid RegisterRequest request) throws IOException {
-            AuthenticationResponse response = userService.addNewUser(request, Role.PATIENT);
-            return ResponseHelper.okay(response, HttpStatus.CREATED);
+        if (request.getAvatar() != null && !validateFile(request.getAvatar())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        AuthenticationResponse response = userService.addNewUser(request, Role.PATIENT);
+        return ResponseHelper.okay(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "{patientId}")
@@ -97,6 +100,7 @@ public class PatientController {
                                                      @Size(max = 10000000) @RequestParam("file") MultipartFile file) {
 
         try {
+            if (!validateFile(file)) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             userService.uploadProfilePicture(patientId, file);
         } catch (IOException e) {
             e.printStackTrace();
