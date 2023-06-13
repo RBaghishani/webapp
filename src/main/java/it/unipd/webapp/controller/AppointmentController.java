@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,16 +54,14 @@ public class AppointmentController {
     public ResponseEntity<?> listAppointments(
             @RequestParam(required = false) Long doctorId,
             @RequestParam(required = false) Long patientId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
         try {
             List<Appointment> appointments = appointmentService.listAppointments(doctorId, patientId, date);
             List<AppointmentDto> responseDtos = appointments.stream()
                     .map(appointment -> modelMapper.map(appointment, AppointmentDto.class))
                     .collect(Collectors.toList());
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("message", "Appointments retrieved successfully.");
-//            response.put("appointments", responseDtos);
+
             return ResponseEntity.ok(responseDtos);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
@@ -87,4 +85,18 @@ public class AppointmentController {
         }
     }
 
+    @GetMapping("/available")
+    public ResponseEntity<?> listAvailableTimeSlots(
+            @RequestParam Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        try {
+            List<LocalDateTime> availableTimeSlots = appointmentService.listAvailableTimeSlots(doctorId, date);
+            return ResponseEntity.ok(availableTimeSlots);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }
