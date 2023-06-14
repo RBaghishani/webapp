@@ -38,11 +38,11 @@ public class AppointmentService {
 
     public Appointment createAppointment(AppointmentDto appointmentDto) throws IOException {
         LocalDateTime time = appointmentDto.getTime();
-        if (!isTimeSlotAvailable(appointmentDto.getDoctorId(),time,duration))
+        if (!isTimeSlotAvailable(appointmentDto.getDoctorId(), time))
             throw new AppointmentConflictException("There is not available time slot for this doctor at this time.", HttpStatus.NOT_FOUND);
         User doctor = userService.getUserByIdAndRole(appointmentDto.getDoctorId(), Role.DOCTOR);
         User patient = userService.getUserByIdAndRole(appointmentDto.getPatientId(), Role.PATIENT);
-        LocalDateTime timePlusOne = time.plusMinutes(duration);
+        LocalDateTime timePlusOne = time.plusMinutes(duration).minusSeconds(1);
         String prescription = appointmentDto.getPrescription();
 
         if (appointmentRepository.existsByDoctorAndTimeBetween(doctor, time, timePlusOne))
@@ -86,12 +86,12 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found.", HttpStatus.NOT_FOUND));
         LocalDateTime time = appointmentDto.getTime();
-        if (!isTimeSlotAvailable(appointmentDto.getDoctorId(),time,duration))
+        if (!isTimeSlotAvailable(appointmentDto.getDoctorId(), time))
             throw new AppointmentConflictException("There is not available time slot for this doctor at this time.", HttpStatus.NOT_FOUND);
 
         User doctor = userService.getUserByIdAndRole(appointmentDto.getDoctorId(), Role.DOCTOR);
         User patient = userService.getUserByIdAndRole(appointmentDto.getPatientId(), Role.PATIENT);
-        LocalDateTime timePlusOne = time.plusMinutes(30);
+        LocalDateTime timePlusOne = time.plusMinutes(duration).minusSeconds(1);
         String prescription = appointmentDto.getPrescription();
 
         if (appointmentRepository.existsByDoctorAndTimeBetween(doctor, time, timePlusOne) && !appointment.getDoctor().equals(doctor))
@@ -132,17 +132,8 @@ public class AppointmentService {
         return timeSlots;
     }
 
-    public boolean isTimeSlotAvailable(Long doctorId, LocalDateTime time, int duration) throws IOException {
+    public boolean isTimeSlotAvailable(Long doctorId, LocalDateTime time) throws IOException {
         List<LocalDateTime> availableTimeSlots = listAvailableTimeSlots(doctorId, time.toLocalDate());
-        LocalDateTime timePlusDuration = time.plusMinutes(duration);
-        for (LocalDateTime availableTimeSlot : availableTimeSlots) {
-            LocalDateTime availableTimeSlotPlusDuration = availableTimeSlot.plusMinutes(duration);
-            if ((time.isAfter(availableTimeSlot) && time.isBefore(availableTimeSlotPlusDuration))
-                    || (timePlusDuration.isAfter(availableTimeSlot) && timePlusDuration.isBefore(availableTimeSlotPlusDuration))
-                    || (time.isBefore(availableTimeSlot) && timePlusDuration.isAfter(availableTimeSlotPlusDuration))) {
-                return false;
-            }
-        }
         return availableTimeSlots.contains(time);
     }
 
