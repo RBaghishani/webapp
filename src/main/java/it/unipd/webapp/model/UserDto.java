@@ -1,6 +1,7 @@
 package it.unipd.webapp.model;
 
 import it.unipd.webapp.enums.Gender;
+import it.unipd.webapp.enums.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,8 @@ public class UserDto {
     private String lastname;
     @Enumerated(EnumType.STRING)
     private Gender gender;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     private boolean isMfaEnable;
 }
 
