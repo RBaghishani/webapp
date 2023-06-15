@@ -44,9 +44,11 @@ public class UserService {
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found - " + userId));
-        user.getProfilePicture();
+
+        // Delete user's profile picture if it exists
+        deleteExistingProfilePicture(user);
+
         userRepository.deleteById(userId);
-        //todo remove files related to this user
     }
 
     @Transactional
@@ -112,7 +114,6 @@ public class UserService {
     }
 
     public void uploadProfilePicture(Long userId, MultipartFile file) throws IOException {
-        //todo remove avatar  (previous one if exists)
         Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new IllegalArgumentException("User not found - " + userId);
@@ -120,11 +121,23 @@ public class UserService {
 
         User user = optionalUser.get();
 
+        // Delete previous avatar if it exists
+        deleteExistingProfilePicture(user);
+
         String filename = saveFile(file);
 
         // Update user's profile picture filename
         user.setProfilePicture(filename);
         userRepository.save(user);
+    }
+
+    private static void deleteExistingProfilePicture(User user) {
+        if (user.getProfilePicture() != null) {
+            File avatarFile = new File("uploads/" + user.getProfilePicture());
+            if (avatarFile.exists()) {
+                avatarFile.delete();
+            }
+        }
     }
 
 }
