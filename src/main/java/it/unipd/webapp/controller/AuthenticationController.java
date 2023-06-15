@@ -1,5 +1,6 @@
 package it.unipd.webapp.controller;
 
+import it.unipd.webapp.enums.Role;
 import it.unipd.webapp.model.AuthenticationRequest;
 import it.unipd.webapp.model.AuthenticationResponse;
 import it.unipd.webapp.model.RegisterRequest;
@@ -27,6 +28,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> register(
             @Valid RegisterRequest request
     ) throws IOException {
+        request.setRole(Role.PATIENT);
         return ResponseEntity.ok(service.register(request));
     }
     @PostMapping("/authenticate")
