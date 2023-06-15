@@ -57,7 +57,7 @@ public class DoctorController {
         try {
             DoctorDto doctorDto = convertToDto(userService.getUserByIdAndRole(doctorId, Role.DOCTOR));
             return ResponseHelper.okay(doctorDto, HttpStatus.OK);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -72,6 +72,9 @@ public class DoctorController {
         } catch (IOException e) {
             return ResponseHelper.error("Error occurred while adding new doctor: " + e.getMessage(),
                     HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return ResponseHelper.error("Error occurred while adding new doctor: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -115,6 +118,8 @@ public class DoctorController {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         return ResponseEntity.ok().build();

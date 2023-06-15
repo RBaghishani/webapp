@@ -59,11 +59,13 @@ public class PatientController {
             return ResponseHelper.okay(patientDto, HttpStatus.OK);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<Object> registerNewPatient(@Valid RegisterRequest request) throws IOException {
+    public ResponseEntity<Object> registerNewPatient(@Valid RegisterRequest request) throws Exception {
         if (request.getAvatar() != null && !validateFile(request.getAvatar())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         AuthenticationResponse response = userService.addNewUser(request, Role.PATIENT);
         return ResponseHelper.okay(response, HttpStatus.CREATED);
@@ -108,6 +110,8 @@ public class PatientController {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         return ResponseEntity.ok().build();

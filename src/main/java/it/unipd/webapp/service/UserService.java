@@ -3,6 +3,7 @@ package it.unipd.webapp.service;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import it.unipd.webapp.entity.User;
 import it.unipd.webapp.enums.Role;
+import it.unipd.webapp.helpers.AesFileUtils;
 import it.unipd.webapp.model.AuthenticationResponse;
 import it.unipd.webapp.model.RegisterRequest;
 import it.unipd.webapp.repository.UserRepository;
@@ -11,17 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.crypto.BadPaddingException;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import static it.unipd.webapp.service.Utils.encodeFileToBase64;
 import static it.unipd.webapp.service.Utils.saveFile;
 
 @Service
 public class UserService {
 
+    private static final String ENCRYPTED_DIRECTORY = "encrypted";
     private final UserRepository userRepository;
 
     private final AuthenticationService authenticationService;
@@ -36,7 +40,7 @@ public class UserService {
         return userRepository.findByRole(role);
     }
 
-    public AuthenticationResponse addNewUser(RegisterRequest request, Role role) throws IOException {
+    public AuthenticationResponse addNewUser(RegisterRequest request, Role role) throws Exception {
         request.setRole(role);
         return authenticationService.register(request);
     }
@@ -96,12 +100,21 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User getUserByIdAndRole(Long userId, Role role) throws IOException {
+    public User getUserByIdAndRole(Long userId, Role role) throws Exception {
         User user = userRepository.findByIdAndRole(userId, role)
                 .orElseThrow(() -> new IllegalStateException("User not found - " + userId));
         if (user.getProfilePicture() != null){
-            File directory = new File("uploads");
-            String base64Img = encodeFileToBase64(directory.getAbsolutePath() + File.separator + user.getProfilePicture());
+            // Decrypt the file and set the avatar field
+            Path inputFile = Paths.get(ENCRYPTED_DIRECTORY, user.getProfilePicture());
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try {
+                AesFileUtils.decryptFile(inputFile, outputStream);
+            } catch (BadPaddingException e) {
+                // Handle exception
+                throw new Exception("Error decrypting file: " + e.getMessage());
+            }
+            byte[] decryptedBytes = outputStream.toByteArray();
+            String base64Img = Base64.getEncoder().encodeToString(decryptedBytes);
             user.setAvatar(base64Img);
         }
         return user;
@@ -113,7 +126,7 @@ public class UserService {
 
     }
 
-    public void uploadProfilePicture(Long userId, MultipartFile file) throws IOException {
+    public void uploadProfilePicture(Long userId, MultipartFile file) throws Exception {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new IllegalArgumentException("User not found - " + userId);
@@ -133,9 +146,9 @@ public class UserService {
 
     private static void deleteExistingProfilePicture(User user) {
         if (user.getProfilePicture() != null) {
-            File avatarFile = new File("uploads/" + user.getProfilePicture());
-            if (avatarFile.exists()) {
-                avatarFile.delete();
+            File encryptedFile = new File(ENCRYPTED_DIRECTORY + File.separator + user.getProfilePicture());
+            if (encryptedFile.exists()) {
+                encryptedFile.delete();
             }
         }
     }
