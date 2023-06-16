@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 @Data
 @Builder
@@ -19,6 +20,7 @@ public class AuthenticationRequest {
     private String email;
     @Size(min = 8)
     private String password;
+    @Nullable
     @Min(100000)
     @Max(999999)
     private Integer code;

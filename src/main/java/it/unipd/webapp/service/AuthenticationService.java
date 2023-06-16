@@ -37,7 +37,7 @@ public class AuthenticationService {
 
     private final MfaService mfaService;
 
-    public AuthenticationResponse register(RegisterRequest request) throws IOException {
+    public AuthenticationResponse register(RegisterRequest request) throws Exception {
         Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
         if (userOptional.isPresent()) {
             throw new DuplicateEmailException("email taken before!", HttpStatus.METHOD_NOT_ALLOWED);
@@ -69,7 +69,6 @@ public class AuthenticationService {
                 .refreshToken(refreshToken)
                 .build();
     }
-
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

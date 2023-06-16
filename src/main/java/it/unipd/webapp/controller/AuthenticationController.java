@@ -1,5 +1,6 @@
 package it.unipd.webapp.controller;
 
+import it.unipd.webapp.enums.Role;
 import it.unipd.webapp.model.AuthenticationRequest;
 import it.unipd.webapp.model.AuthenticationResponse;
 import it.unipd.webapp.model.RegisterRequest;
@@ -10,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -26,7 +26,8 @@ public class AuthenticationController {
     @PostMapping(path = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<AuthenticationResponse> register(
             @Valid RegisterRequest request
-    ) throws IOException {
+    ) throws Exception {
+        request.setRole(Role.PATIENT);
         return ResponseEntity.ok(service.register(request));
     }
     @PostMapping("/authenticate")
