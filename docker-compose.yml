@@ -2,14 +2,15 @@ version: '3.1'
 
 services:
   app:
-    image: 'doctor-plus:0.0.2'
+    #    image: 'doctor-plus:0.0.11'
     build:
       context: .
     container_name: doctor-plus
     depends_on:
       - db
-    ports:
-      - "8080:8080"
+        #    ports:
+      #      - "8080:8080"
+    restart: always
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/patient
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -19,10 +20,26 @@ services:
       - LETSENCRYPT_HOST=doctor-plus.westeurope.cloudapp.azure.com
       - CERT_NAME=doctor-plus.westeurope.cloudapp.azure.com
       - VIRTUAL_PORT=8080
+      - VIRTUAL_PATH=/api
+      - VIRTUAL_DEST=/api
+
+  front:
+    image: steebchen/nginx-spa:stable
+    volumes:
+      - ./dist/:/app
+    environment:
+      - VIRTUAL_HOST=doctor-plus.westeurope.cloudapp.azure.com
+      - LETSENCRYPT_HOST=doctor-plus.westeurope.cloudapp.azure.com
+      - CERT_NAME=doctor-plus.westeurope.cloudapp.azure.com
+      - VIRTUAL_PORT=80
+      - VIRTUAL_PATH=/
+      - VIRTUAL_DEST=/
+    command: nginx
 
   db:
     image: 'postgres:13.1-alpine'
     container_name: db
+    restart: always
     environment:
       - POSTGRES_DB=patient
       - POSTGRES_USER=postgres
